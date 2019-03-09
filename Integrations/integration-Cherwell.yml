@@ -1,0 +1,487 @@
+category: IT Services
+commonfields:
+  id: Cherwell
+  version: -1
+configuration:
+- display: url
+  name: url
+  required: true
+  type: 0
+- display: Username
+  name: credentials
+  required: false
+  type: 9
+- display: Client ID
+  name: client_id
+  required: true
+  type: 0
+- defaultvalue: 'true'
+  display: Trust any certificate (unsecure)
+  name: insecure
+  required: false
+  type: 8
+- display: Use system proxy
+  name: proxy
+  required: false
+  type: 8
+- defaultvalue: 3 days
+  display: First fetch timestamp (<number> <time unit>, e.g., 12 hours, 7 days)
+  name: fetch_time
+  required: false
+  type: 0
+description: Integration Template
+detaileddescription: Use these detailed instructions in order to retrieve the API
+  key
+display: Cherwell
+name: Cherwell
+script:
+  commands:
+  - arguments:
+    - default: false
+      isArray: false
+      name: description
+      description: ""
+      required: true
+      secret: false
+    - auto: PREDEFINED
+      default: false
+      isArray: false
+      name: priority
+      description: ""
+      predefined:
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: customer_display_name
+      description: ""
+      predefined:
+      - ''
+      required: true
+      secret: false
+    description: Get items from service.
+    execution: false
+    name: cherwell-create-incident
+    outputs:
+    - contextPath: Example.Item.ID
+      description: Item ID
+      type: number
+    - contextPath: Example.Item.Name
+      description: Item name
+      type: string
+    - contextPath: Example.Item.CreatedDate
+      description: Item creation date
+      type: date
+  - arguments:
+    - auto: PREDEFINED
+      default: false
+      isArray: false
+      name: priority
+      description: ""
+      predefined:
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: description
+      description: ""
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: owned_by
+      description: ""
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: incident_id
+      description: ""
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: fields_list
+      description: ""
+      required: false
+      secret: false
+    execution: false
+    description: ""
+    name: cherwell-update-incident
+  - execution: false
+    name: cherwell-list-incidents
+    description: ""
+  - arguments:
+    - default: false
+      isArray: false
+      name: incident_id
+      description: ""
+      required: true
+      secret: false
+    execution: false
+    name: cherwell-get-incident
+    description: ""
+  - arguments:
+    - default: false
+      isArray: false
+      name: incident_id
+      description: ""
+      required: true
+      secret: false
+    - auto: PREDEFINED
+      default: false
+      isArray: false
+      name: status
+      description: ""
+      predefined:
+      - In Cart
+      - New
+      - Assigned
+      - In Progress
+      - Pending
+      - Resolved
+      - Reopened
+      - Closed
+      required: true
+      secret: false
+    execution: false
+    name: cherwell-update-incident-status
+    description: ""
+  isfetch: false
+  runonce: false
+  script: |-
+    import demistomock as demisto
+    from CommonServerPython import *
+    from CommonServerUserPython import *
+
+    ''' IMPORTS '''
+
+    import json
+    import requests
+    from distutils.util import strtobool
+
+    # Disable insecure warnings
+    requests.packages.urllib3.disable_warnings()
+
+    USERNAME = demisto.params().get('credentials').get('identifier')
+    PASSWORD = demisto.params().get('credentials').get('password')  # Remove trailing slash to prevent wrong URL path to service
+    SERVER = demisto.params()['url'][:-1] if (demisto.params()['url'] and demisto.params()['url'].endswith('/')) else demisto.params()['url']
+    CLIENT_ID = demisto.params().get('client_id')
+    # Service base URL
+    BASE_URL = SERVER + '/CherwellAPI/'
+
+    BUSINESS_OBJECT_IDS = {
+        "incident": "6dd53665c0c24cab86870a21cf6434ae"
+    }
+
+    INCIDENT_FIELD_DICT = {
+        "description": {
+            "displayName": "Description",
+            "name": "Description",
+            "field_id": "252b836fc72c4149915053ca1131d138"
+        },
+        "priority": {
+            "displayName": "Priority",
+            "name": "Priority",
+            "field_id": "83c36313e97b4e6b9028aff3b401b71c"
+        },
+        "customer_display_name": {
+            "displayName": "Customer Display Name",
+            "name": "CustomerDisplayName",
+            "field_id": "93734aaff77b19d1fcfd1d4b4aba1b0af895f25788"
+        },
+        "owned_by": {
+            "displayName": "Owned By",
+            "name": "OwnedBy",
+            "field_id": "9339fc404e4c93350bf5be446fb13d693b0bb7f219"
+        },
+        "owned_by_team": {
+            "displayName": "Owned By Team",
+            "name": "OwnedByTeam",
+            "field_id": "6dd53665c0c24cab86870a21cf6434ae"
+        },
+        'incident_id': {
+            "displayName": "Incident ID",
+            "field_id": "6ae282c55e8e4266ae66ffc070c17fa3",
+            "name": "IncidentID",
+        },
+        'status': {
+            "displayName": "Status",
+            "field_id": "5eb3234ae1344c64a19819eda437f18d",
+            "name": "Status"
+        }
+
+    }
+
+    INCIDENT_HEADERS = [
+        "IncidentID",
+        "Status",
+        "CustomerDisplayName",
+        "Description",
+        "OwnedBy",
+        "OwnedByTeam",
+        "CreatedDateTime",
+        "SLAResolveByDeadline"
+    ]
+
+
+    ############################################################################################################################################################################################################
+
+
+    def parse_response(response, error_operation):
+        try:
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError:
+            err_msg = response.json().get('errorMessage') if response.json().get('errorMessage') else response.json().get('error_description')
+            return_error(error_operation + ": " + err_msg)
+        except Exception, error:
+            return_error("Could not parse response ".format(error))
+
+
+    def parse_fields_from_business_object(Field_list):
+        new_business_obj = {}
+        for field in Field_list:
+            if field.get('name') in INCIDENT_HEADERS:
+                field_name = field.get('name')
+                new_business_obj[field_name] = field.get('value')
+
+        return new_business_obj
+
+
+    def parse_fields_from_response(response, filter=None):
+        object_list = []
+        for business_obj in response.get('businessObjects'):
+            new_business_obj = parse_fields_from_business_object(business_obj.get('fields'))
+            object_list.append(new_business_obj)
+
+        return object_list
+
+
+    def build_fields_for_incident(args):
+        fields = []
+        for arg_key, arg_value in args.iteritems():
+            new_field = {
+                "dirty": "true",
+                "displayName": demisto.get(INCIDENT_FIELD_DICT, "{}.displayName".format(arg_key)),
+                "fieldId": demisto.get(INCIDENT_FIELD_DICT, "{}.field_id".format(arg_key)),
+                "name": demisto.get(INCIDENT_FIELD_DICT, "{}.name".format(arg_key)),
+                "value": arg_value
+            }
+            fields.append(new_field)
+        return fields
+
+
+    def get_token():
+        url = BASE_URL + "token"
+
+        payload = "grant_type=password&client_id={0}&username={1}&password={2}".format(CLIENT_ID, USERNAME, PASSWORD)
+        headers = {
+            'Accept': "application/json",
+            'Content-Type': "application/x-www-form-urlencoded",
+        }
+
+        response = requests.request("POST", url, data=payload, headers=headers)
+        res_json = parse_response(response, "Could not get token")
+        return res_json.get('access_token')
+
+
+    def save_business_object(payload):
+        url = BASE_URL + "api/V1/savebusinessobject"
+
+        headers = {
+            'Content-Type': "application/json",
+            'Authorization': "Bearer {}".format(TOKEN)
+        }
+
+        response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
+        res_json = parse_response(response, "Could not perform this action")
+        return res_json
+
+
+    def get_business_object(busob_id, public_id):
+        url = BASE_URL + "api/V1/getbusinessobject/busobid/{0}/publicid/{1}".format(busob_id, public_id)
+
+        headers = {
+            'Authorization': "Bearer {}".format(TOKEN)
+        }
+
+        response = requests.request("GET", url, headers=headers)
+        res_json = parse_response(response, "Could not get incident")
+        return res_json
+
+
+    def get_search_results(payload):
+        url = BASE_URL + "api/V1/getsearchresults"
+
+        headers = {
+            'Content-Type': "application/json",
+            'Authorization': "Bearer {}".format(TOKEN)
+        }
+
+        response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
+        res_json = parse_response(response, "Could not get incidents")
+        return res_json
+
+
+    def create_incident():
+        args = demisto.args()
+        payload = {
+            "busObId": BUSINESS_OBJECT_IDS['incident'],
+            "fields": build_fields_for_incident(args)
+        }
+
+        result = save_business_object(payload)
+        incident_id = result.get('busObPublicId')
+        md = "### New Incident was created: {}".format(incident_id)
+        demisto.results({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': result,
+            'HumanReadable': md,
+            'EntryContext': {
+                'Cherwell.Incidents': {"IncidentID": incident_id}
+            }
+        })
+
+
+    def update_incident():
+        args = demisto.args()
+        incident_id = args.get('incident_id')
+        fields_list = args.get('fields_list')
+        args.pop('incident_id')
+
+        incident_fields = build_fields_for_incident(args)
+        incident_fields_to_update = incident_fields if not fields_list else incident_fields.append(fields_list)
+
+        payload = {
+            "busObId": BUSINESS_OBJECT_IDS['incident'],
+            "busObPublicId": incident_id,
+            "fields": incident_fields_to_update
+        }
+
+        results = save_business_object(payload)
+        md = "### Incident: {} was updated".format(incident_id)
+        demisto.results({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': results,
+            'HumanReadable': md
+        })
+
+
+    def update_incident_status():
+        args = demisto.args()
+        incident_id = args.get('incident_id')
+        status = args.get('status')
+        args.pop('incident_id')
+
+        payload = {
+            "busObId": BUSINESS_OBJECT_IDS['incident'],
+            "busObPublicId": incident_id,
+            "fields": build_fields_for_incident(args)
+        }
+
+        results = save_business_object(payload)
+
+        md = "### Incident: {0} new status is: {1}".format(incident_id, status)
+        demisto.results({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': results,
+            'HumanReadable': md,
+            'EntryContext': {
+                'Cherwell.Incidents(val.IncidentID == {0}).Status'.format(incident_id): status
+            }
+        })
+
+
+    def list_incidents():
+        payload = {
+            "busObId": BUSINESS_OBJECT_IDS['incident'],
+            "pageNumber": 0,
+            "pageSize": 300,
+            "scope": "Global",
+            "scopeOwner": "(None)",
+            "searchName": "List objects",
+            "includeAllFields": True,
+        }
+
+        results = get_search_results(payload)
+        incidents = parse_fields_from_response(results, BUSINESS_OBJECT_IDS['incident'])
+        md = tableToMarkdown('Incidents List', incidents, headers=INCIDENT_HEADERS, removeNull=True, headerTransform=pascalToSpace)
+
+        demisto.results({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': results,
+            'HumanReadable': md,
+            'EntryContext': {
+                'Cherwell.Incidents': incidents
+            }
+        })
+
+
+    def get_incident():
+        args = demisto.args()
+        incident_id = args.get('incident_id')
+        show_all = args.get('show_all')
+        results = get_business_object(BUSINESS_OBJECT_IDS["incident"], incident_id)
+        incident = parse_fields_from_business_object(results.get('fields'))
+        md = tableToMarkdown('Incidents Number: '.format(incident_id), incident, headers=INCIDENT_HEADERS, removeNull=True, headerTransform=pascalToSpace)
+
+        demisto.results({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': results,
+            'HumanReadable': md,
+            'EntryContext': {
+                'Cherwell.Incidents(val.IncidentID == obj.IncidentID)': createContext(incident, removeNull=True)
+            }
+        })
+
+
+    ################################################################################################################################################################################################################################################
+
+
+    ''' COMMANDS MANAGER / SWITCH PANEL '''
+
+    LOG('Command being called is %s' % (demisto.command()))
+
+    try:
+        TOKEN = get_token()
+        if demisto.command() == 'test-module':
+            demisto.results('ok')
+        elif demisto.command() == 'cherwell-create-incident':
+            create_incident()
+
+        elif demisto.command() == 'cherwell-update-incident':
+            update_incident()
+
+        elif demisto.command() == 'cherwell-list-incidents':
+            list_incidents()
+
+        elif demisto.command() == 'cherwell-get-incident':
+            get_incident()
+
+        elif demisto.command() == 'cherwell-update-incident-status':
+            update_incident_status()
+
+    # Log exceptions
+    except Exception, e:
+        LOG(e.message)
+        LOG.print_log()
+        return_error("Unexpected error: {}".format(e))
+  type: python
