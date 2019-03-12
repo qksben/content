@@ -224,6 +224,28 @@ script:
     description: Updates the task
     execution: false
     name: cherwell-update-task
+  - arguments:
+    - default: false
+      description: Name of the business object
+      isArray: false
+      name: business_obj_name
+      required: false
+      secret: false
+    - default: false
+      description: ID of the business ID (will override name if provided)
+      isArray: false
+      name: business_obj_id
+      required: false
+      secret: false
+    - default: false
+      description: Text to look for in the business object.
+      isArray: false
+      name: search_text
+      required: true
+      secret: false
+    description: Searches for a text in a business object.
+    execution: false
+    name: cherwell-search-in-business-object
   isfetch: false
   runonce: false
   script: |-
@@ -516,31 +538,6 @@ script:
         })
 
 
-    def update_task():
-        args = demisto.args()
-        task_id = args.get('task_id')
-        fields_list = args.get('fields_list')
-        args.pop('task_id')
-
-        task_fields = build_fields_for_task(args)
-        task_fields_to_update = task_fields if not fields_list else task_fields.append(fields_list)
-
-        payload = {
-            "busObId": BUSINESS_OBJECT_IDS['task'],
-            "busObPublicId": task_id,
-            "fields": task_fields_to_update
-        }
-
-        results = save_business_object(payload)
-        md = "### Task: {} was updated".format(task_id)
-        return ({
-            'Type': entryTypes['note'],
-            'ContentsFormat': formats['json'],
-            'Contents': results,
-            'HumanReadable': md
-        })
-
-
     def list_incidents():
         payload = {
             "busObId": BUSINESS_OBJECT_IDS['incident'],
@@ -549,7 +546,6 @@ script:
         }
 
         results = get_search_results(payload)
-        demisto.results(results)
         incidents = parse_fields_from_response(results, BUSINESS_OBJECT_IDS['incident'])
         md = tableToMarkdown('Incidents List', incidents, headers=INCIDENT_HEADERS, removeNull=True, headerTransform=pascalToSpace)
 
@@ -627,12 +623,74 @@ script:
     def update_task_command():
         demisto.results(update_task())
 
+
+    def update_task():
+        args = demisto.args()
+        task_id = args.get('task_id')
+        fields_list = args.get('fields_list')
+        args.pop('task_id')
+
+        task_fields = build_fields_for_task(args)
+        task_fields_to_update = task_fields if not fields_list else task_fields.append(fields_list)
+
+        payload = {
+            "busObId": BUSINESS_OBJECT_IDS['task'],
+            "busObPublicId": task_id,
+            "fields": task_fields_to_update
+        }
+
+        results = save_business_object(payload)
+        md = "### Task: {} was updated".format(task_id)
+        return ({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': results,
+            'HumanReadable': md
+        })
+
+
+    def search_in_business_object_command():
+        args = demisto.args()
+        res = search_in_business_object()
+        results = parse_fields_from_response(res, BUSINESS_OBJECT_IDS['incident']) if 'business_obj_name' in args else res
+        md = tableToMarkdown('Search Results', results, removeNull=True, headerTransform=pascalToSpace)
+
+        demisto.results({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': res,
+            'HumanReadable': md,
+            'EntryContext': {
+                'Cherwell.Search': results
+            }
+        })
+
+
+    def search_in_business_object():
+        args = demisto.args()
+        if 'business_obj_name' in args or 'business_obj_id' in args:
+            try:
+                bus_id = args.get('business_obj_id') if 'business_obj_id' in args else BUSINESS_OBJECT_IDS[args.get('business_obj_name').lower()]
+                payload = {
+                    "busObId": bus_id,
+                    "pageNumber": 0,
+                    "pageSize": 300,
+                    "searchText": args.get('search_text')
+                }
+            except KeyError:
+                return_error('Error: ID for {} not found'.format(args.get('business_obj_name')))
+        else:
+            return_error('Error: Please provide either a business object ID or Name')
+        return get_search_results(payload)
+
+
     ################################################################################################################################################################################################################################################
 
 
     ''' COMMANDS MANAGER / SWITCH PANEL '''
 
     LOG('Command being called is %s' % (demisto.command()))
+
 
     try:
         TOKEN = get_token()
@@ -661,6 +719,9 @@ script:
 
         elif demisto.command() == 'cherwell-update-task':
             update_task_command()
+
+        elif demisto.command() == 'cherwell-search-in-business-object':
+            search_in_business_object_command()
 
     # Log exceptions
     except Exception, e:
