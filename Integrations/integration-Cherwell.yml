@@ -330,6 +330,13 @@ script:
         "SLAResolveByDeadline"
     ]
 
+    SEARCH_BUSINESS_OBJ_HEADERS = [
+        'BusObRecId',
+        'busObRecId',
+        'busObId',
+        'hasError'
+    ]
+
     TASK_FIELD_DICT = {
         'title': {
             "displayName": "Title",
@@ -652,7 +659,7 @@ script:
     def search_in_business_object_command():
         res = search_in_business_object()
         results = res.get('businessObjects')
-        md = tableToMarkdown('Search Results', results, removeNull=True, headerTransform=pascalToSpace)
+        md = tableToMarkdown('Search Results', results, headers=SEARCH_BUSINESS_OBJ_HEADERS, removeNull=True, headerTransform=pascalToSpace)
 
         demisto.results({
             'Type': entryTypes['note'],
