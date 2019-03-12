@@ -190,6 +190,40 @@ script:
     description: Creates a task
     execution: false
     name: cherwell-create-task
+  - arguments:
+    - default: false
+      description: Owner of the task.
+      isArray: false
+      name: owned_by
+      required: false
+      secret: false
+    - default: false
+      description: Tasks' title
+      isArray: false
+      name: title
+      required: false
+      secret: false
+    - default: false
+      description: The status of the task.
+      isArray: false
+      name: status
+      required: false
+      secret: false
+    - default: false
+      description: The description of the task
+      isArray: false
+      name: description
+      required: false
+      secret: false
+    - default: false
+      description: ID of the task.
+      isArray: false
+      name: task_id
+      required: true
+      secret: false
+    description: Updates the task
+    execution: false
+    name: cherwell-update-task
   isfetch: false
   runonce: false
   script: |-
@@ -482,6 +516,31 @@ script:
         })
 
 
+    def update_task():
+        args = demisto.args()
+        task_id = args.get('task_id')
+        fields_list = args.get('fields_list')
+        args.pop('task_id')
+
+        task_fields = build_fields_for_task(args)
+        task_fields_to_update = task_fields if not fields_list else task_fields.append(fields_list)
+
+        payload = {
+            "busObId": BUSINESS_OBJECT_IDS['task'],
+            "busObPublicId": task_id,
+            "fields": task_fields_to_update
+        }
+
+        results = save_business_object(payload)
+        md = "### Task: {} was updated".format(task_id)
+        return ({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': results,
+            'HumanReadable': md
+        })
+
+
     def list_incidents():
         payload = {
             "busObId": BUSINESS_OBJECT_IDS['incident'],
@@ -565,6 +624,9 @@ script:
         })
 
 
+    def update_task_command():
+        demisto.results(update_task())
+
     ################################################################################################################################################################################################################################################
 
 
@@ -596,6 +658,9 @@ script:
 
         elif demisto.command() == 'cherwell-create-task':
             create_task_command()
+
+        elif demisto.command() == 'cherwell-update-task':
+            update_task_command()
 
     # Log exceptions
     except Exception, e:
