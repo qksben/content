@@ -162,6 +162,34 @@ script:
     description: Search for the field id.
     execution: false
     name: cherwell-get-business-object-summary
+  - arguments:
+    - default: false
+      description: Task's title.
+      isArray: false
+      name: title
+      required: true
+      secret: false
+    - default: false
+      description: Owner of the task.
+      isArray: false
+      name: owned_by
+      required: true
+      secret: false
+    - default: false
+      description: Status of the task
+      isArray: false
+      name: status
+      required: true
+      secret: false
+    - default: false
+      description: Description for the task.
+      isArray: false
+      name: description
+      required: false
+      secret: false
+    description: Creates a task
+    execution: false
+    name: cherwell-create-task
   isfetch: false
   runonce: false
   script: |-
@@ -182,7 +210,8 @@ script:
     BASE_URL = SERVER + '/CherwellAPI/'
 
     BUSINESS_OBJECT_IDS = {
-        "incident": "6dd53665c0c24cab86870a21cf6434ae"
+        "incident": "6dd53665c0c24cab86870a21cf6434ae",
+        "task": "9355d5ed41e384ff345b014b6cb1c6e748594aea5b",
     }
 
     INCIDENT_FIELD_DICT = {
@@ -245,6 +274,28 @@ script:
         "SLAResolveByDeadline"
     ]
 
+    TASK_FIELD_DICT = {
+        'title': {
+            "displayName": "Title",
+            "field_id": "93ad98a2d68a61778eda3d4d9cbb30acbfd458aea4",
+            "name": "Title"
+        },
+        'owned_by': {
+            "displayName": "Owned By",
+            "field_id": "93cfd5a4e13f7d4a4de1914f638abebee3a982bb50",
+            "name": "OwnedBy"
+        },
+        'status': {
+            "displayName": "Status",
+            "field_id": "9368f0fb7b744108a666984c21afc932562eb7dc16",
+            "name": "Status"
+        },
+        "description": {
+            "displayName": "Description",
+            "name": "Description",
+            "field_id": "9355d5ef648edf7a8ed5604d56af11170cce5dc25e"
+        },
+    }
 
     ############################################################################################################################################################################################################
 
@@ -286,6 +337,20 @@ script:
                 "displayName": demisto.get(INCIDENT_FIELD_DICT, "{}.displayName".format(arg_key)),
                 "fieldId": demisto.get(INCIDENT_FIELD_DICT, "{}.field_id".format(arg_key)),
                 "name": demisto.get(INCIDENT_FIELD_DICT, "{}.name".format(arg_key)),
+                "value": arg_value
+            }
+            fields.append(new_field)
+        return fields
+
+
+    def build_fields_for_task(args):
+        fields = []
+        for arg_key, arg_value in args.iteritems():
+            new_field = {
+                "dirty": "true",
+                "displayName": demisto.get(TASK_FIELD_DICT, "{}.displayName".format(arg_key)),
+                "fieldId": demisto.get(TASK_FIELD_DICT, "{}.field_id".format(arg_key)),
+                "name": demisto.get(TASK_FIELD_DICT, "{}.name".format(arg_key)),
                 "value": arg_value
             }
             fields.append(new_field)
@@ -476,6 +541,30 @@ script:
         return response.json()
 
 
+    def create_task_command():
+        demisto.results(create_task())
+
+    def create_task():
+        args = demisto.args()
+        payload = {
+            "busObId": BUSINESS_OBJECT_IDS['task'],
+            "fields": build_fields_for_task(args)
+        }
+
+        result = save_business_object(payload)
+        task_id = result.get('busObPublicId')
+        md = "### New Task was created: {}".format(task_id)
+        return({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': result,
+            'HumanReadable': md,
+            'EntryContext': {
+                'Cherwell.Tasks': {"TaskID": task_id}
+            }
+        })
+
+
     ################################################################################################################################################################################################################################################
 
 
@@ -504,6 +593,9 @@ script:
 
         elif demisto.command() == 'cherwell-get-business-object-summary':
             get_business_object_command()
+
+        elif demisto.command() == 'cherwell-create-task':
+            create_task_command()
 
     # Log exceptions
     except Exception, e:
