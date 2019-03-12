@@ -650,9 +650,8 @@ script:
 
 
     def search_in_business_object_command():
-        args = demisto.args()
         res = search_in_business_object()
-        results = parse_fields_from_response(res, BUSINESS_OBJECT_IDS['incident']) if 'business_obj_name' in args else res
+        results = res.get('businessObjects')
         md = tableToMarkdown('Search Results', results, removeNull=True, headerTransform=pascalToSpace)
 
         demisto.results({
