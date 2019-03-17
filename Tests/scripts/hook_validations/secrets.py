@@ -149,6 +149,7 @@ def search_potential_secrets(secrets_file_paths):
         secrets_found_with_regex = []
         yml_file_contents = None
         file_path_temp, file_extension = os.path.splitext(file_path)
+        skip_line = None
 
         # Get generic white list set
         secrets_white_list, ioc_white_list = get_white_list()
@@ -164,7 +165,7 @@ def search_potential_secrets(secrets_file_paths):
         # Search by lines after strings with high entropy as possibly suspicious
         for line in file_contents.split('\n'):
             # if detected disable-secrets comment, skip the line
-            skip_line = is_secrets_disabled(line)
+            skip_line = is_secrets_disabled(line, skip_line)
             if skip_line:
                 continue
             # REGEX scanning for IOCs and false positive groups
@@ -336,13 +337,14 @@ def remove_false_positives(line):
     return line
 
 
-def is_secrets_disabled(line):
-    skip_secrets = False
+def is_secrets_disabled(line, skip_secrets):
     if bool(re.findall(r'(disable-secrets-detection)', line)):
         skip_secrets = True
     elif bool(re.findall(r'(disable-secrets-detection-start)', line)):
         skip_secrets = True
     elif bool(re.findall(r'(disable-secrets-detection-end)', line)):
+        skip_secrets = False
+    elif not skip_secrets:
         skip_secrets = False
 
     return skip_secrets
