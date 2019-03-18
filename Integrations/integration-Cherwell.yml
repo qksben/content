@@ -304,7 +304,7 @@ script:
         "owned_by_team": {
             "displayName": "Owned By Team",
             "name": "OwnedByTeam",
-            "field_id": "6dd53665c0c24cab86870a21cf6434ae"
+            "field_id": "93cfd5a4e10af4933a573444d08cbc412da491b42e"
         },
         'incident_id': {
             "displayName": "Incident ID",
@@ -358,6 +358,12 @@ script:
             "name": "Description",
             "field_id": "9355d5ef648edf7a8ed5604d56af11170cce5dc25e"
         },
+
+        'owned_by': {
+            "displayName": "Owned By Team",
+            "field_id": "93cfd5a4e10af4933a573444d08cbc412da491b42e",
+            "name": "OwnedByTeam"
+        }
     }
 
     ############################################################################################################################################################################################################
