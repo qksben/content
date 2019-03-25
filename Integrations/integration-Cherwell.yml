@@ -9,7 +9,7 @@ configuration:
   type: 0
 - display: Username
   name: credentials
-  required: false
+  required: true
   type: 9
 - display: Client ID
   name: client_id
@@ -62,12 +62,37 @@ script:
       secret: false
     - default: false
       isArray: false
-      name: status
+      name: owned_by_team
       required: true
       secret: false
     - default: false
       isArray: false
       name: customer_display_name
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: source
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: service
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: category
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: form_view
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: short_description
       required: true
       secret: false
     description: Get items from service.
@@ -104,18 +129,58 @@ script:
       secret: false
     - default: false
       isArray: false
+      name: service
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: category
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: subcategory
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: customer_display_name
+      required: false
+      secret: false
+    - default: false
+      isArray: false
       name: owned_by
       required: false
       secret: false
     - default: false
       isArray: false
-      name: incident_id
-      required: true
+      name: owned_by_team
+      required: false
       secret: false
     - default: false
       isArray: false
-      name: fields_list
+      name: source
       required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: form_view
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: short_description
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: status
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: incident_public_id
+      required: true
       secret: false
     execution: false
     name: cherwell-update-incident
@@ -123,45 +188,23 @@ script:
     name: cherwell-list-incidents
   - arguments:
     - default: false
-      isArray: false
-      name: incident_id
-      required: true
-      secret: false
-    execution: false
-    name: cherwell-get-incident
-  - arguments:
-    - default: false
+      description: The incident recored or public ID
       isArray: false
       name: incident_id
       required: true
       secret: false
     - auto: PREDEFINED
       default: false
+      description: Type of ID
       isArray: false
-      name: status
+      name: id_type
       predefined:
-      - In Cart
-      - New
-      - Assigned
-      - In Progress
-      - Pending
-      - Resolved
-      - Reopened
-      - Closed
+      - record_id
+      - public_id
       required: true
       secret: false
     execution: false
-    name: cherwell-update-incident-status
-  - arguments:
-    - default: false
-      description: The business object name.
-      isArray: false
-      name: name
-      required: true
-      secret: false
-    description: Search for the field id.
-    execution: false
-    name: cherwell-get-business-object-summary
+    name: cherwell-get-incident
   - arguments:
     - default: false
       description: Task's title.
@@ -170,43 +213,39 @@ script:
       required: true
       secret: false
     - default: false
-      description: Owner of the task.
-      isArray: false
-      name: owned_by
-      required: true
-      secret: false
-    - default: false
-      description: Status of the task
-      isArray: false
-      name: status
-      required: true
-      secret: false
-    - default: false
       description: Description for the task.
       isArray: false
       name: description
-      required: false
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: owned_by_team
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: type
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: vendor_record
+      required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: incident_record_id
+      required: true
       secret: false
     description: Creates a task
     execution: false
     name: cherwell-create-task
   - arguments:
     - default: false
-      description: Owner of the task.
-      isArray: false
-      name: owned_by
-      required: false
-      secret: false
-    - default: false
       description: Tasks' title
       isArray: false
       name: title
-      required: false
-      secret: false
-    - default: false
-      description: The status of the task.
-      isArray: false
-      name: status
       required: false
       secret: false
     - default: false
@@ -218,8 +257,33 @@ script:
     - default: false
       description: ID of the task.
       isArray: false
-      name: task_id
+      name: task_public_id
       required: true
+      secret: false
+    - default: false
+      isArray: false
+      name: owned_by
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: status
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: owned_by_team
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: type
+      required: false
+      secret: false
+    - default: false
+      isArray: false
+      name: vendor_record
+      required: false
       secret: false
     description: Updates the task
     execution: false
@@ -246,6 +310,25 @@ script:
     description: Searches for a text in a business object.
     execution: false
     name: cherwell-search-in-business-object
+  - arguments:
+    - auto: PREDEFINED
+      default: false
+      defaultValue: Type of ID
+      isArray: false
+      name: id_type
+      predefined:
+      - record_id
+      - public_id
+      required: true
+      secret: false
+    - default: false
+      description: Public or record ID of the task
+      isArray: false
+      name: task_id
+      required: true
+      secret: false
+    execution: false
+    name: cherwell-get-task
   isfetch: false
   runonce: false
   script: |-
@@ -259,8 +342,8 @@ script:
     requests.packages.urllib3.disable_warnings()
 
     USERNAME = demisto.params().get('credentials').get('identifier')
-    PASSWORD = demisto.params().get('credentials').get('password')  # Remove trailing slash to prevent wrong URL path to service
-    SERVER = demisto.params()['url'][:-1] if (demisto.params()['url'] and demisto.params()['url'].endswith('/')) else demisto.params()['url']
+    PASSWORD = demisto.params().get('credentials').get('password')
+    SERVER = demisto.params()['url'][:-1] if (demisto.params()['url'] and demisto.params()['url'].endswith('/')) else demisto.params()['url']  # Remove trailing slash to prevent wrong URL path to service
     CLIENT_ID = demisto.params().get('client_id')
     # Service base URL
     BASE_URL = SERVER + '/CherwellAPI/'
@@ -271,10 +354,20 @@ script:
     }
 
     INCIDENT_FIELD_DICT = {
-        "createdDateTime": {
-            "displayName": "Created Date Time",
-            "name": "CreatedDateTime",
-            "field_id": "c1e86f31eb2c4c5f8e8615a5189e9b19"
+        # "createdDateTime": {
+        #     "displayName": "Created Date Time",
+        #     "name": "CreatedDateTime",
+        #     "field_id": "c1e86f31eb2c4c5f8e8615a5189e9b19"
+        # },
+        "service": {
+            "displayName": "Service",
+            "name": "Service",
+            "field_id": "936725cd10c735d1dd8c5b4cd4969cb0bd833655f4"
+        },
+        "category": {
+            "displayName": "Category",
+            "name": "Category",
+            "field_id": "9e0b434034e94781ab29598150f388aa"
         },
         "subcategory": {
             "displayName": "Subcategory",
@@ -304,34 +397,81 @@ script:
         "owned_by_team": {
             "displayName": "Owned By Team",
             "name": "OwnedByTeam",
-            "field_id": "93cfd5a4e10af4933a573444d08cbc412da491b42e"
+            "field_id": "9339fc404e8d5299b7a7c64de79ab81a1c1ff4306c"
         },
-        'incident_id': {
-            "displayName": "Incident ID",
-            "field_id": "6ae282c55e8e4266ae66ffc070c17fa3",
-            "name": "IncidentID",
+        'source': {
+            "displayName": "Source",
+            "field_id": "93670bdf8abe2cd1f92b1f490a90c7b7d684222e13",
+            "name": "Source"
+        },
+        'form_view': {
+            "displayName": "Form View",
+            "field_id": "9416983037b2b2cded624d4168964b5f0fce05d285",
+            "name": "FormView"
+        },
+        'short_description': {
+            "displayName": "Short Description",
+            "field_id": "93e8ea93ff67fd95118255419690a50ef2d56f910c",
+            "name": "ShortDescription"
         },
         'status': {
             "displayName": "Status",
             "field_id": "5eb3234ae1344c64a19819eda437f18d",
             "name": "Status"
+        },
+        'restaurant_number': {
+            "displayName": "Restaurant Number",
+            "field_id": "9413aa138a4d8ec546418249499b66c9aa948eb522",
+            "name": "RestaurantNumber"
         }
-
     }
 
-    INCIDENT_HEADERS = [
-        "IncidentID",
+    INCIDENT_HEADERS_NAMES = [
+        "IncidentPublicID",
+        "IncidentRecordID",
         "Status",
         "CustomerDisplayName",
         "Description",
         "OwnedBy",
         "OwnedByTeam",
+        "TotalTasks",
         "CreatedDateTime",
         "SLAResolveByDeadline"
     ]
 
+    TASK_HEADERS_NAMES = [
+        "TaskPublicID",
+        "TaskRecordID",
+        "ParentPublicID",
+        "ParentTypeName",
+        "Status",
+        "CustomerDisplayName",
+        "Description",
+        "OwnedBy",
+        "OwnedByTeam",
+        "TotalTasks",
+        "CreatedDateTime",
+        "SLAResolveByDeadline"
+    ]
+
+    INCIDENT_HEADERS_IDS = [
+        "6ae282c55e8e4266ae66ffc070c17fa3",  # Incident ID
+        "936725cd10c735d1dd8c5b4cd4969cb0bd833655f4",  # Service
+        "9e0b434034e94781ab29598150f388aa",  # Category
+        "1163fda7e6a44f40bb94d2b47cc58f46",  # Subcategory
+        "252b836fc72c4149915053ca1131d138",  # Description
+        "83c36313e97b4e6b9028aff3b401b71c",  # Priority
+        "93734aaff77b19d1fcfd1d4b4aba1b0af895f25788",  # Customer Display Name
+        "9339fc404e4c93350bf5be446fb13d693b0bb7f219",  # OwnedBy
+        "9339fc404e8d5299b7a7c64de79ab81a1c1ff4306c",  # Owned By Team
+        "93670bdf8abe2cd1f92b1f490a90c7b7d684222e13",  # Source
+        "9416983037b2b2cded624d4168964b5f0fce05d285",  # FormView
+        "93e8ea93ff67fd95118255419690a50ef2d56f910c",  # Short Description
+        "c1e86f31eb2c4c5f8e8615a5189e9b19"  # Created Date Time
+        "5eb3234ae1344c64a19819eda437f18d"  # Status
+    ]
+
     SEARCH_BUSINESS_OBJ_HEADERS = [
-        'BusObRecId',
         'busObRecId',
         'busObId',
         'hasError'
@@ -358,22 +498,38 @@ script:
             "name": "Description",
             "field_id": "9355d5ef648edf7a8ed5604d56af11170cce5dc25e"
         },
-
-        'owned_by': {
+        'owned_by_team': {
             "displayName": "Owned By Team",
             "field_id": "93cfd5a4e10af4933a573444d08cbc412da491b42e",
             "name": "OwnedByTeam"
+        },
+        'type': {
+            "field_id": "9355d5ed6ca15a8308c5e24389b2138b3aa9b6c7fa",
+            "name": "Type",
+            "displayName": "Type"
+        },
+        'vendor_record': {
+            "field_id": "942c29e6afe42dcbceaf024539b61a843e6d9d3599",
+            "name": "VendorRecord",
+            "displayName": "Vendor Record"
         }
     }
+
+    RELATIONSHIP_IDS = {
+        "incident_owns_task": "9369187528b417b4a17aaa4646b7f7a78b3c821be9"
+    }
+
 
     ############################################################################################################################################################################################################
 
     def parse_response(response, error_operation):
         try:
             response.raise_for_status()
+            if not response.content:
+                return
             return response.json()
         except requests.exceptions.HTTPError:
-            err_msg = response.json().get('errorMessage') if response.json().get('errorMessage') else response.json().get('error_description')
+            err_msg = response.json().get('errorMessage') or response.json().get('error_description') or response.json().get('Message')
             return_error(error_operation + ": " + err_msg)
         except Exception, error:
             return_error("Could not parse response ".format(error))
@@ -382,14 +538,13 @@ script:
     def parse_fields_from_business_object(Field_list):
         new_business_obj = {}
         for field in Field_list:
-            if field.get('name') in INCIDENT_HEADERS:
-                field_name = field.get('name')
-                new_business_obj[field_name] = field.get('value')
+            field_name = field.get('name')
+            new_business_obj[field_name] = field.get('value')
 
         return new_business_obj
 
 
-    def parse_fields_from_response(response, filter=None):
+    def parse_fields_from_response(response):
         object_list = []
         for business_obj in response.get('businessObjects'):
             new_business_obj = parse_fields_from_business_object(business_obj.get('fields'))
@@ -403,7 +558,7 @@ script:
         for arg_key, arg_value in args.iteritems():
             new_field = {
                 "dirty": "true",
-                "displayName": demisto.get(INCIDENT_FIELD_DICT, "{}.displayName".format(arg_key)),
+                # "displayName": demisto.get(INCIDENT_FIELD_DICT, "{}.displayName".format(arg_key)),
                 "fieldId": demisto.get(INCIDENT_FIELD_DICT, "{}.field_id".format(arg_key)),
                 "name": demisto.get(INCIDENT_FIELD_DICT, "{}.name".format(arg_key)),
                 "value": arg_value
@@ -449,17 +604,16 @@ script:
         }
 
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
-        res_json = parse_response(response, "Could not perform this action")
+        res_json = parse_response(response, "Could not save business object")
         return res_json
 
 
-    def get_business_object(busob_id, public_id):
-        url = BASE_URL + "api/V1/getbusinessobject/busobid/{0}/publicid/{1}".format(busob_id, public_id)
-
+    def get_business_object(busob_id, incident_id, id_type):
+        id_type_str = 'publicid' if id_type == 'public_id' else 'busobrecid'
+        url = BASE_URL + "api/V1/getbusinessobject/busobid/{0}/{1}/{2}".format(busob_id, id_type_str, incident_id)
         headers = {
             'Authorization': "Bearer {}".format(TOKEN)
         }
-
         response = requests.request("GET", url, headers=headers)
         res_json = parse_response(response, "Could not get incident")
         return res_json
@@ -480,43 +634,45 @@ script:
 
     def create_incident():
         args = demisto.args()
-        args["createdDateTime"] = datetime.now().strftime("%m-%d-%y %H:%M:%S %p")
+        # args["createdDateTime"] = datetime.now().strftime("%m-%d-%y %H:%M:%S %p")
         payload = {
             "busObId": BUSINESS_OBJECT_IDS['incident'],
             "fields": build_fields_for_incident(args)
         }
 
         result = save_business_object(payload)
-        incident_id = result.get('busObPublicId')
-        md = "### New Incident was created: {}".format(incident_id)
+        ids = {
+            'IncidentPublicID': result.get('busObPublicId'),
+            'IncidentRecordID': result.get('busObRecId')
+        }
+        md = tableToMarkdown('New Incident was created', ids, headerTransform=pascalToSpace)
+
         demisto.results({
             'Type': entryTypes['note'],
             'ContentsFormat': formats['json'],
             'Contents': result,
             'HumanReadable': md,
             'EntryContext': {
-                'Cherwell.Incidents': {"IncidentID": incident_id}
+                'Cherwell.Incidents(val.IncidentPublicID == obj.IncidentPublicID)': ids
             }
         })
 
 
     def update_incident():
         args = demisto.args()
-        incident_id = args.get('incident_id')
-        fields_list = args.get('fields_list')
-        args.pop('incident_id')
+        incident_public_id = args.get('incident_public_id')
+        args.pop('incident_public_id')
 
         incident_fields = build_fields_for_incident(args)
-        incident_fields_to_update = incident_fields if not fields_list else incident_fields.append(fields_list)
 
         payload = {
             "busObId": BUSINESS_OBJECT_IDS['incident'],
-            "busObPublicId": incident_id,
-            "fields": incident_fields_to_update
+            "busObPublicId": incident_public_id,
+            "fields": incident_fields
         }
 
         results = save_business_object(payload)
-        md = "### Incident: {} was updated".format(incident_id)
+        md = "### Incident: {} was updated".format(incident_public_id)
         demisto.results({
             'Type': entryTypes['note'],
             'ContentsFormat': formats['json'],
@@ -527,26 +683,26 @@ script:
 
     def update_incident_status():
         args = demisto.args()
-        incident_id = args.get('incident_id')
+        incident_public_id = args.get('incident_public_id')
         status = args.get('status')
-        args.pop('incident_id')
+        args.pop('incident_public_id')
 
         payload = {
             "busObId": BUSINESS_OBJECT_IDS['incident'],
-            "busObPublicId": incident_id,
+            "busObPublicId": incident_public_id,
             "fields": build_fields_for_incident(args)
         }
 
         results = save_business_object(payload)
 
-        md = "### Incident: {0} new status is: {1}".format(incident_id, status)
+        md = "### Incident: {0} new status is: {1}".format(incident_public_id, status)
         demisto.results({
             'Type': entryTypes['note'],
             'ContentsFormat': formats['json'],
             'Contents': results,
             'HumanReadable': md,
             'EntryContext': {
-                'Cherwell.Incidents(val.IncidentID == {0}).Status'.format(incident_id): status
+                'Cherwell.Incidents(val.IncidentID == {0}).Status'.format(incident_public_id): status
             }
         })
 
@@ -556,11 +712,12 @@ script:
             "busObId": BUSINESS_OBJECT_IDS['incident'],
             "pageNumber": 0,
             "pageSize": 300,
+            "fields": INCIDENT_HEADERS_IDS
         }
 
         results = get_search_results(payload)
-        incidents = parse_fields_from_response(results, BUSINESS_OBJECT_IDS['incident'])
-        md = tableToMarkdown('Incidents List', incidents, headers=INCIDENT_HEADERS, removeNull=True, headerTransform=pascalToSpace)
+        incidents = parse_fields_from_response(results)
+        md = tableToMarkdown('Incidents List', incidents, headers=INCIDENT_HEADERS_NAMES, removeNull=True, headerTransform=pascalToSpace)
 
         demisto.results({
             'Type': entryTypes['note'],
@@ -573,13 +730,15 @@ script:
         })
 
 
-    def get_incident():
+    def get_incident_command():
         args = demisto.args()
         incident_id = args.get('incident_id')
-        show_all = args.get('show_all')
-        results = get_business_object(BUSINESS_OBJECT_IDS["incident"], incident_id)
+        id_type = args.get('id_type')
+        results = get_business_object(BUSINESS_OBJECT_IDS["incident"], incident_id, id_type)
         incident = parse_fields_from_business_object(results.get('fields'))
-        md = tableToMarkdown('Incidents Number: '.format(incident_id), incident, headers=INCIDENT_HEADERS, removeNull=True, headerTransform=pascalToSpace)
+        incident['IncidentPublicID'] = results.get('busObPublicId')
+        incident['IncidentRecordID'] = results.get('busObRecId')
+        md = tableToMarkdown('Incidents Number: {}'.format(incident_id), incident, headers=INCIDENT_HEADERS_NAMES, removeNull=True, headerTransform=pascalToSpace)
 
         demisto.results({
             'Type': entryTypes['note'],
@@ -587,30 +746,48 @@ script:
             'Contents': results,
             'HumanReadable': md,
             'EntryContext': {
-                'Cherwell.Incidents(val.IncidentID == obj.IncidentID)': createContext(incident, removeNull=True)
+                'Cherwell.Incidents(val.IncidentPublicID == obj.IncidentPublicID)': createContext(incident, removeNull=True)
             }
         })
 
 
-    def get_business_object_command():
-        demisto.results(get_business_object_summary())
-
-    def get_business_object_summary():
+    def get_task_command():
         args = demisto.args()
-        name = args.get('name')
-        url = BASE_URL + "api/V1/getbusinessobjectsummary/busobname/{}".format(name)
+        task_id = args.get('task_id')
+        id_type = args.get('id_type')
+        results = get_business_object(BUSINESS_OBJECT_IDS["task"], task_id, id_type)
+        task = parse_fields_from_business_object(results.get('fields'))
+        task['TaskPublicID'] = results.get('busObPublicId')
+        task['TaskRecordID'] = results.get('busObRecId')
+        md = tableToMarkdown('Task Number: {}'.format(task_id), task, headers=TASK_HEADERS_NAMES, removeNull=True, headerTransform=pascalToSpace)
 
-        headers = {
-            'Content-Type': "application/json",
-            'Authorization': "Bearer {}".format(TOKEN)
-        }
+        demisto.results({
+            'Type': entryTypes['note'],
+            'ContentsFormat': formats['json'],
+            'Contents': results,
+            'HumanReadable': md,
+            'EntryContext': {
+                'Cherwell.Tasks(val.TaskPublicID == obj.TaskPublicID)': createContext(task, removeNull=True)
+            }
+        })
 
-        response = requests.request("GET", url, headers=headers)
-        return response.json()
+
+    # def get_business_object_command():
+    #     demisto.results(get_business_object_summary())
 
 
-    def create_task_command():
-        demisto.results(create_task())
+    # def get_business_object_summary():
+    #     args = demisto.args()
+    #     name = args.get('name')
+    #     url = BASE_URL + "api/V1/getbusinessobjectsummary/busobname/{}".format(name)
+    #
+    #     headers = {
+    #         'Content-Type': "application/json",
+    #         'Authorization': "Bearer {}".format(TOKEN)
+    #     }
+    #
+    #     response = requests.request("GET", url, headers=headers)
+    #     return response.json()
 
     def create_task():
         args = demisto.args()
@@ -619,16 +796,95 @@ script:
             "fields": build_fields_for_task(args)
         }
 
-        result = save_business_object(payload)
-        task_id = result.get('busObPublicId')
-        md = "### New Task was created: {}".format(task_id)
-        return({
+        # payload = {
+        #     "fields": [
+        #         {
+        #             "displayName": "Status",
+        #             "fieldId": "9368f0fb7b744108a666984c21afc932562eb7dc16",
+        #             "dirty": "true",
+        #             "name": "Status",
+        #             "value": "New"
+        #         },
+        #         {
+        #             "fieldId": "9355d5ef648edf7a8ed5604d56af11170cce5dc25e",
+        #             "displayName": "Description",
+        #             "dirty": "true",
+        #             "value": "task description",
+        #             "name": "Description"
+        #         },
+        #         {
+        #             "fieldId": "93ad98a2d68a61778eda3d4d9cbb30acbfd458aea4",
+        #             "displayName": "Title",
+        #             "dirty": "true",
+        #             "value": "task title",
+        #             "name": "Title"
+        #         },
+        #         {
+        #             "dirty": "true",
+        #             "displayName": "Next Status Text",
+        #             "fieldId": "93d380768b15aeedaf86064b079df33a4e1e60caaa",
+        #             "name": "NextStatusText",
+        #             "value": "Acknowledge"
+        #         },
+        #         {
+        #             "dirty": "true",
+        #             "displayName": "Task Type ID",
+        #             "fieldId": "942df01b5fe45a39f6fdaa48d3a10ddd304fa2e6c8",
+        #             "name": "TaskTypeID",
+        #             "value": "942e71e8c5c493f3e5f2f54f5c9c086719b6bc8d83"
+        #         },
+        #         {
+        #             "fieldId": "93d3807e794090fc3ec96c436ab72e111dcd3d94dd",
+        #             "displayName": "Status ID",
+        #             "dirty": "true",
+        #             "value": "93ad9c0fd473c969351fd34dde9b56ae91705fa3e8",
+        #             "name": "StatusID"
+        #         }
+        #     ],
+        #     "busObId": "9355d5ed41e384ff345b014b6cb1c6e748594aea5b"
+        # }
+
+        response = save_business_object(payload)
+        return response
+
+
+    def link_related_business_objects(parent_business_object_id, parent_business_object_record_id, relationship_id, business_object_id, business_object_record_id):
+        url = BASE_URL + "api/V1/linkrelatedbusinessobject/parentbusobid/{0}/parentbusobrecid/{1}/relationshipid/{2}/busobid/{3}/busobrecid/{4}".format(parent_business_object_id,
+                                                                                                                                                        parent_business_object_record_id,
+                                                                                                                                                        relationship_id,
+                                                                                                                                                        business_object_id,
+                                                                                                                                                        business_object_record_id)
+        headers = {
+            'Accept': "application/json",
+            'Authorization': "Bearer {}".format(TOKEN)
+        }
+
+        response = requests.request("GET", url, headers=headers)
+        parse_response(response, "Could not link business objects")
+        return
+
+
+    def create_task_command():
+        args = demisto.args()
+        parent_business_object_record_id = args.get('incident_record_id')
+        args.pop('incident_record_id')
+        result = create_task()
+        link_related_business_objects(BUSINESS_OBJECT_IDS['incident'], parent_business_object_record_id, RELATIONSHIP_IDS['incident_owns_task'], BUSINESS_OBJECT_IDS['task'], result.get('busObRecId'))
+
+        ids = {
+            'TaskPublicID': result.get('busObPublicId'),
+            'TaskRecordID': result.get('busObRecId'),
+            'IncidentRecordID': parent_business_object_record_id
+        }
+        md = tableToMarkdown('New Task was created', ids, headerTransform=pascalToSpace)
+
+        demisto.results({
             'Type': entryTypes['note'],
             'ContentsFormat': formats['json'],
             'Contents': result,
             'HumanReadable': md,
             'EntryContext': {
-                'Cherwell.Tasks': {"TaskID": task_id}
+                'Cherwell.Tasks(val.TaskPublicID == obj.TaskPublicID)': ids
             }
         })
 
@@ -639,21 +895,19 @@ script:
 
     def update_task():
         args = demisto.args()
-        task_id = args.get('task_id')
-        fields_list = args.get('fields_list')
-        args.pop('task_id')
+        task_public_id = args.get('task_public_id')
+        args.pop('task_public_id')
 
         task_fields = build_fields_for_task(args)
-        task_fields_to_update = task_fields if not fields_list else task_fields.append(fields_list)
 
         payload = {
             "busObId": BUSINESS_OBJECT_IDS['task'],
-            "busObPublicId": task_id,
-            "fields": task_fields_to_update
+            "busObPublicId": task_public_id,
+            "fields": task_fields
         }
 
         results = save_business_object(payload)
-        md = "### Task: {} was updated".format(task_id)
+        md = "### Task: {} was updated".format(task_public_id)
         return ({
             'Type': entryTypes['note'],
             'ContentsFormat': formats['json'],
@@ -663,17 +917,17 @@ script:
 
 
     def search_in_business_object_command():
-        res = search_in_business_object()
-        results = res.get('businessObjects')
-        md = tableToMarkdown('Search Results', results, headers=SEARCH_BUSINESS_OBJ_HEADERS, removeNull=True, headerTransform=pascalToSpace)
+        results = search_in_business_object()
+        incidents = parse_fields_from_response(results)
+        md = tableToMarkdown('Search Results', incidents, removeNull=True, headerTransform=pascalToSpace)
 
         demisto.results({
             'Type': entryTypes['note'],
             'ContentsFormat': formats['json'],
-            'Contents': res,
+            'Contents': results,
             'HumanReadable': md,
             'EntryContext': {
-                'Cherwell.Search': results
+                'Cherwell.Search': createContext(incidents, removeNull=True)
             }
         })
 
@@ -687,7 +941,8 @@ script:
                     "busObId": bus_id,
                     "pageNumber": 0,
                     "pageSize": 300,
-                    "searchText": args.get('search_text')
+                    "searchText": args.get('search_text'),
+                    "fields": INCIDENT_HEADERS_IDS
                 }
             except KeyError:
                 return_error('Error: ID for {} not found'.format(args.get('business_obj_name')))
@@ -703,7 +958,6 @@ script:
 
     LOG('Command being called is %s' % (demisto.command()))
 
-
     try:
         TOKEN = get_token()
         if demisto.command() == 'test-module':
@@ -718,22 +972,25 @@ script:
             list_incidents()
 
         elif demisto.command() == 'cherwell-get-incident':
-            get_incident()
+            get_incident_command()
+
+        elif demisto.command() == 'cherwell-create-task':
+            create_task_command()
 
         elif demisto.command() == 'cherwell-update-incident-status':
             update_incident_status()
 
-        elif demisto.command() == 'cherwell-get-business-object-summary':
-            get_business_object_command()
-
-        elif demisto.command() == 'cherwell-create-task':
-            create_task_command()
+        # elif demisto.command() == 'cherwell-get-business-object-summary':
+        #     get_business_object_command()
 
         elif demisto.command() == 'cherwell-update-task':
             update_task_command()
 
         elif demisto.command() == 'cherwell-search-in-business-object':
             search_in_business_object_command()
+
+        elif demisto.command() == 'cherwell-get-task':
+            get_task_command()
 
     # Log exceptions
     except Exception, e:
