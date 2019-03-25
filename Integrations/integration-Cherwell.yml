@@ -206,8 +206,10 @@ script:
       required: true
       secret: false
     execution: false
+    description: Update a given incident
     name: cherwell-update-incident
   - execution: false
+    description: List all incidents
     name: cherwell-list-incidents
   - arguments:
     - default: false
@@ -227,6 +229,7 @@ script:
       required: true
       secret: false
     execution: false
+    description: Update a given incident
     name: cherwell-get-incident
   - arguments:
     - default: false
@@ -360,6 +363,7 @@ script:
       name: task_id
       required: true
       secret: false
+    description: Search free text onsode a businsess object list
     execution: false
     name: cherwell-get-task
   isfetch: false
