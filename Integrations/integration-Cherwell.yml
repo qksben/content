@@ -38,12 +38,14 @@ script:
   commands:
   - arguments:
     - default: false
+      description: "-"
       isArray: false
       name: description
       required: true
       secret: false
     - auto: PREDEFINED
       default: false
+      description: "-"
       isArray: false
       name: priority
       predefined:
@@ -56,41 +58,49 @@ script:
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: subcategory
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: owned_by_team
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: customer_display_name
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: source
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: service
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: category
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: form_view
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: short_description
       required: true
@@ -111,6 +121,7 @@ script:
   - arguments:
     - auto: PREDEFINED
       default: false
+      description: "-"
       isArray: false
       name: priority
       predefined:
@@ -123,61 +134,73 @@ script:
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: description
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: service
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: category
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: subcategory
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: customer_display_name
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: owned_by
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: owned_by_team
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: source
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: form_view
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: short_description
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: status
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: incident_public_id
       required: true
@@ -219,21 +242,25 @@ script:
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: owned_by_team
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: type
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: vendor_record
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: incident_record_id
       required: true
@@ -261,26 +288,31 @@ script:
       required: true
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: owned_by
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: status
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: owned_by_team
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: type
       required: false
       secret: false
     - default: false
+      description: "-"
       isArray: false
       name: vendor_record
       required: false
@@ -314,6 +346,7 @@ script:
     - auto: PREDEFINED
       default: false
       defaultValue: Type of ID
+      description: "-"
       isArray: false
       name: id_type
       predefined:
