@@ -38,14 +38,14 @@ script:
   commands:
   - arguments:
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: description
       required: true
       secret: false
     - auto: PREDEFINED
       default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: priority
       predefined:
@@ -58,49 +58,49 @@ script:
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: subcategory
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: owned_by_team
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: customer_display_name
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: source
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: service
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: category
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: form_view
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: short_description
       required: true
@@ -121,7 +121,7 @@ script:
   - arguments:
     - auto: PREDEFINED
       default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: priority
       predefined:
@@ -134,82 +134,82 @@ script:
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: description
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: service
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: category
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: subcategory
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: customer_display_name
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: owned_by
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: owned_by_team
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: source
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: form_view
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: short_description
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: status
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: incident_public_id
       required: true
       secret: false
-    execution: false
     description: Update a given incident
+    execution: false
     name: cherwell-update-incident
-  - execution: false
-    description: List all incidents
+  - description: List all incidents
+    execution: false
     name: cherwell-list-incidents
   - arguments:
     - default: false
@@ -228,8 +228,8 @@ script:
       - public_id
       required: true
       secret: false
-    execution: false
     description: Update a given incident
+    execution: false
     name: cherwell-get-incident
   - arguments:
     - default: false
@@ -245,25 +245,25 @@ script:
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: owned_by_team
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: type
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: vendor_record
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: incident_record_id
       required: true
@@ -291,31 +291,31 @@ script:
       required: true
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: owned_by
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: status
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: owned_by_team
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: type
       required: false
       secret: false
     - default: false
-      description: "-"
+      description: '-'
       isArray: false
       name: vendor_record
       required: false
@@ -349,7 +349,7 @@ script:
     - auto: PREDEFINED
       default: false
       defaultValue: Type of ID
-      description: "-"
+      description: '-'
       isArray: false
       name: id_type
       predefined:
@@ -391,11 +391,6 @@ script:
     }
 
     INCIDENT_FIELD_DICT = {
-        # "createdDateTime": {
-        #     "displayName": "Created Date Time",
-        #     "name": "CreatedDateTime",
-        #     "field_id": "c1e86f31eb2c4c5f8e8615a5189e9b19"
-        # },
         "service": {
             "displayName": "Service",
             "name": "Service",
@@ -488,31 +483,39 @@ script:
         "OwnedByTeam",
         "TotalTasks",
         "CreatedDateTime",
-        "SLAResolveByDeadline"
+        "SLAResolveByDeadline",
+        "VendorRecord"
     ]
+    # disable-secrets-detection-start
+    HEADERS_IDS = {
+        'incident': [
+            "6ae282c55e8e4266ae66ffc070c17fa3",  # Incident ID
+            "936725cd10c735d1dd8c5b4cd4969cb0bd833655f4",  # Service
+            "9e0b434034e94781ab29598150f388aa",  # Category
+            "1163fda7e6a44f40bb94d2b47cc58f46",  # Subcategory
+            "252b836fc72c4149915053ca1131d138",  # Description[
+            "83c36313e97b4e6b9028aff3b401b71c",  # Priority
+            "93734aaff77b19d1fcfd1d4b4aba1b0af895f25788",  # Customer Display Name
+            "9339fc404e4c93350bf5be446fb13d693b0bb7f219",  # OwnedBy
+            "9339fc404e8d5299b7a7c64de79ab81a1c1ff4306c",  # Owned By Team
+            "93670bdf8abe2cd1f92b1f490a90c7b7d684222e13",  # Source
+            "9416983037b2b2cded624d4168964b5f0fce05d285",  # FormView
+            "93e8ea93ff67fd95118255419690a50ef2d56f910c",  # Short Description
+            "c1e86f31eb2c4c5f8e8615a5189e9b19",  # Created Date Time
+            "5eb3234ae1344c64a19819eda437f18d"  # Status
+        ],
+        'task': [
+            "BO:9355d5ed41e384ff345b014b6cb1c6e748594aea5b,FI:93ad98a2d68a61778eda3d4d9cbb30acbfd458aea4",   # Title
+            "BO:9355d5ed41e384ff345b014b6cb1c6e748594aea5b,FI:93cfd5a4e13f7d4a4de1914f638abebee3a982bb50",   # Owned
+            "BO:9355d5ed41e384ff345b014b6cb1c6e748594aea5b,FI:9368f0fb7b744108a666984c21afc932562eb7dc16",   # Status
+            "BO:9355d5ed41e384ff345b014b6cb1c6e748594aea5b,FI:9355d5ef648edf7a8ed5604d56af11170cce5dc25e",   # Description
+            "BO:9355d5ed41e384ff345b014b6cb1c6e748594aea5b,FI:93cfd5a4e10af4933a573444d08cbc412da491b42e",   # Owned
+            "BO:9355d5ed41e384ff345b014b6cb1c6e748594aea5b,FI:9355d5ed6ca15a8308c5e24389b2138b3aa9b6c7fa",   # Type
+            "BO:9355d5ed41e384ff345b014b6cb1c6e748594aea5b,FI:942c29e6afe42dcbceaf024539b61a843e6d9d3599"    # Vendor
+        ]
+    }
 
-    INCIDENT_HEADERS_IDS = [
-        "6ae282c55e8e4266ae66ffc070c17fa3",  # Incident ID
-        "936725cd10c735d1dd8c5b4cd4969cb0bd833655f4",  # Service
-        "9e0b434034e94781ab29598150f388aa",  # Category
-        "1163fda7e6a44f40bb94d2b47cc58f46",  # Subcategory
-        "252b836fc72c4149915053ca1131d138",  # Description
-        "83c36313e97b4e6b9028aff3b401b71c",  # Priority
-        "93734aaff77b19d1fcfd1d4b4aba1b0af895f25788",  # Customer Display Name
-        "9339fc404e4c93350bf5be446fb13d693b0bb7f219",  # OwnedBy
-        "9339fc404e8d5299b7a7c64de79ab81a1c1ff4306c",  # Owned By Team
-        "93670bdf8abe2cd1f92b1f490a90c7b7d684222e13",  # Source
-        "9416983037b2b2cded624d4168964b5f0fce05d285",  # FormView
-        "93e8ea93ff67fd95118255419690a50ef2d56f910c",  # Short Description
-        "c1e86f31eb2c4c5f8e8615a5189e9b19"  # Created Date Time
-        "5eb3234ae1344c64a19819eda437f18d"  # Status
-    ]
-
-    SEARCH_BUSINESS_OBJ_HEADERS = [
-        'busObRecId',
-        'busObId',
-        'hasError'
-    ]
+    # disable-secrets-detection-end
 
     TASK_FIELD_DICT = {
         'title': {
@@ -749,7 +752,7 @@ script:
             "busObId": BUSINESS_OBJECT_IDS['incident'],
             "pageNumber": 0,
             "pageSize": 300,
-            "fields": INCIDENT_HEADERS_IDS
+            "fields": HEADERS_IDS['incident']
         }
 
         results = get_search_results(payload)
@@ -955,8 +958,8 @@ script:
 
     def search_in_business_object_command():
         results = search_in_business_object()
-        incidents = parse_fields_from_response(results)
-        md = tableToMarkdown('Search Results', incidents, removeNull=True, headerTransform=pascalToSpace)
+        parsed_results = parse_fields_from_response(results)
+        md = tableToMarkdown('Search Results', parsed_results, removeNull=True, headerTransform=pascalToSpace)
 
         demisto.results({
             'Type': entryTypes['note'],
@@ -964,22 +967,26 @@ script:
             'Contents': results,
             'HumanReadable': md,
             'EntryContext': {
-                'Cherwell.Search': createContext(incidents, removeNull=True)
+                'Cherwell.Search': createContext(parsed_results, removeNull=True)
             }
         })
 
 
     def search_in_business_object():
         args = demisto.args()
-        if 'business_obj_name' in args or 'business_obj_id' in args:
+        business_obj_name = args.get('business_obj_name')
+        business_obj_id = args.get('business_obj_id')
+        if business_obj_name or business_obj_id:
             try:
-                bus_id = args.get('business_obj_id') if 'business_obj_id' in args else BUSINESS_OBJECT_IDS[args.get('business_obj_name').lower()]
+                bus_id = business_obj_id if business_obj_id else BUSINESS_OBJECT_IDS[business_obj_name.lower()]
+                bus_name = business_obj_name if business_obj_name else BUSINESS_OBJECT_IDS.keys()[BUSINESS_OBJECT_IDS.values().index(bus_id)]
+                fields_list = HEADERS_IDS[bus_name]
                 payload = {
                     "busObId": bus_id,
                     "pageNumber": 0,
                     "pageSize": 300,
                     "searchText": args.get('search_text'),
-                    "fields": INCIDENT_HEADERS_IDS
+                    "fields": fields_list
                 }
             except KeyError:
                 return_error('Error: ID for {} not found'.format(args.get('business_obj_name')))
@@ -1037,4 +1044,4 @@ script:
   type: python
 image: data:image/png;base64,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
 tests:
-  - No tests - For POC only later on tests will be added
+- No tests - For POC only later on tests will be added
