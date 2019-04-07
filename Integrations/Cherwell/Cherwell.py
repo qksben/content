@@ -366,7 +366,8 @@ def get_business_object_record(business_object_id, object_id, id_type):
 
 def delete_business_object_record(business_object_id, object_id, id_type):
     id_type_str = 'publicid' if id_type == 'public_id' else 'busobrecid'
-    url = BASE_URL + "api/V1/deletebusinessobject/busobid/{0}/{1}/{2}".format(business_object_id, id_type_str, object_id)
+    url = BASE_URL + "api/V1/deletebusinessobject/busobid/{0}/{1}/{2}".format(business_object_id, id_type_str,
+                                                                              object_id)
     response = make_request("DELETE", url)
     res_json = parse_response(response, "Could not delete incident")
     return res_json
@@ -568,8 +569,6 @@ def delete_business_object_command():
 #     })
 
 
-
-
 # def get_task_command():
 #     args = demisto.args()
 #     task_id = args.get('task_id')
@@ -604,7 +603,9 @@ def delete_business_object_command():
 
 def link_related_business_objects(parent_business_object_id, parent_business_object_record_id, relationship_id,
                                   business_object_id, business_object_record_id):
-    url = BASE_URL + "api/V1/linkrelatedbusinessobject/parentbusobid/{0}/parentbusobrecid/{1}/relationshipid/{2}/busobid/{3}/busobrecid/{4}".format(
+    url = BASE_URL + \
+          "api/V1/linkrelatedbusinessobject/parentbusobid" \
+          "/{0}/parentbusobrecid/{1}/relationshipid/{2}/busobid/{3}/busobrecid/{4}".format(
         parent_business_object_id,
         parent_business_object_record_id,
         relationship_id,

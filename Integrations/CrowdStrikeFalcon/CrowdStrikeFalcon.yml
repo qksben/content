@@ -329,7 +329,7 @@ script:
   dockerimage: demisto/python3:3.7.2.200
   isfetch: true
   runonce: false
-  script: ''
+  script: '-'
   type: python
 releaseNotes: New integration. The CrowdStrike Falcon OAuth 2 API (formerly known
   as the Falcon Firehose API). Enables fetching and resolving detections, searching
