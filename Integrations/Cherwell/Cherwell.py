@@ -603,15 +603,15 @@ def delete_business_object_command():
 def link_related_business_objects(parent_business_object_id, parent_business_object_record_id, relationship_id,
                                   business_object_id, business_object_record_id):
     url = BASE_URL + \
-          "api/V1/linkrelatedbusinessobject/parentbusobid/" \
-          "{0}/parentbusobrecid/{1}/relationshipid/{2}/busobid/{3}/busobrecid/{4}"\
-              .format(
-              parent_business_object_id,
-              parent_business_object_record_id,
-              relationship_id,
-              business_object_id,
-              business_object_record_id
-          )
+          """api/V1/linkrelatedbusinessobject/parentbusobid/
+          {0}/parentbusobrecid/{1}/relationshipid/{2}/busobid/{3}/busobrecid/{4}"
+          .format(
+          parent_business_object_id,
+          parent_business_object_record_id,
+          relationship_id,
+          business_object_id,
+          business_object_record_id
+          )"""
     response = make_request("GET", url)
     parse_response(response, "Could not link business objects")
     return
